@@ -270,4 +270,4 @@ Output: >
 Success: ❌ Error
 ------------------------------
 Total Success: 31
-Total Errors: 21
+Total Errors: 21    
