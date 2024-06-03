@@ -12,8 +12,8 @@ def problem_detail(request, pk):
 
 
 # problems/views.py
-from django.shortcuts import render, get_object_or_404
-from .models import Problem
+# from django.shortcuts import render, get_object_or_404
+# from .models import Problem
 
 # def problem_list(request):
 #     problems = Problem.objects.all()

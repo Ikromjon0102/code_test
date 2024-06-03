@@ -1,27 +1,23 @@
 <!-- templates/problems/problem_detail.html -->
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ problem.title }}</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
-    <div class="container">
-        <h1>{{ problem.title }}</h1>
-        <p>{{ problem.description }}</p>
-        <h3>Input Format</h3>
-        <p>{{ problem.input_format }}</p>
-        <h3>Output Format</h3>
-        <p>{{ problem.output_format }}</p>
-        <h3>Sample Input</h3>
-        <pre>{{ problem.sample_input }}</pre>
-        <h3>Sample Output</h3>
-        <pre>{{ problem.sample_output }}</pre>
-        <a href="{% url 'submit_code' problem.pk %}" class="btn btn-primary">Submit Your Solution</a>
-        <a href="{% url 'problem_list' %}" class="btn btn-secondary">Back to Problems</a>
-    </div>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %} {{ problem.title }} {% endblock %}
+
+
+{% block content %}
+
+    <h1>{{ problem.title }}</h1>
+    <p>{{ problem.description }}</p>
+    <h3>Input Format</h3>
+    <p>{{ problem.input_format }}</p>
+    <h3>Output Format</h3>
+    <p>{{ problem.output_format }}</p>
+    <h3>Sample Input</h3>
+    <pre>{{ problem.sample_input }}</pre>
+    <h3>Sample Output</h3>
+    <pre>{{ problem.sample_output }}</pre>
+    <a href="{% url 'submissions:submit_code' problem.pk %}" class="btn btn-primary">Submit Your Solution</a>
+    <a href="{% url 'problems:problem_list' %}" class="btn btn-secondary">Back to Problems</a>
+
+{% endblock %}

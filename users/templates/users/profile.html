@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %} Profile Page {% endblock %}
+
+{% block content %}
+
+    <div class="row d-flex justify-content-center">
+
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <div class="image mb-3">
+                        <img class="rounded-circle" src="{{ user.profile_picture.url }}" alt="Profile Picture"
+                             width="150" height="150">
+                    </div>
+                    <h4 class="card-title">{{ user.first_name }} {{ user.last_name }}</h4>
+                    <h6 class="card-subtitle text-muted">@{{ user.username }}</h6>
+                    <p class="card-text mt-2">{{ user.email }}</p>
+                    <a class="btn btn-primary mt-3" href="{% url 'users:profile-edit' %}">Edit Profile</a>
+                </div>
+                <div class="card-footer text-muted">
+                    <div class="d-flex justify-content-center">
+                        <a href="#" class="btn btn-social-icon btn-twitter mx-1"><i class="fa fa-twitter"></i></a>
+                        <a href="#" class="btn btn-social-icon btn-facebook mx-1"><i class="fa fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-social-icon btn-instagram mx-1"><i class="fa fa-instagram"></i></a>
+                        <a href="#" class="btn btn-social-icon btn-linkedin mx-1"><i class="fa fa-linkedin"></i></a>
+                    </div>
+                    <div class="mt-3">
+                        <small>Joined: {{ user.date_joined|date:"M Y" }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title">Solved Problems</h4>
+                    {% if user.userproblem_set.all %}
+                        <ul class="list-group list-group-flush mt-3">
+                            {% for user_problem in user.userproblem_set.all %}
+                                <li class="list-group-item"> {{ user_problem.problem.id }}:  <a style="color:black; text-decoration: none" href="{% url 'problems:problem_detail' user_problem.problem.id %}">{{ user_problem.problem.title     }}</a></li>
+
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="mt-3">No problems solved yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
