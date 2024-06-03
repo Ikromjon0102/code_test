@@ -37,8 +37,13 @@
         <h2>Problem: {{ submission.problem.title }}</h2>
         <h3>Your Code:</h3>
         <pre>{{ submission.code }}</pre>
-        <h3>Result:</h3>
+        {% if error %}
+            <h3>Result: All tests {{ success | add:error }} -> ❌ Error - {{ error }} | ✅ Success - {{ success }}</h3>
+        {% else %}
+            <h3>Result: All tests {{ success }} -> ✅ Success - {{ success }}</h3>
+        {% endif %}
         <pre>{{ submission.result }}</pre>
+
         <a href="{% url 'problem_list' %}" class="btn btn-secondary">Back to Problems</a>
     </div>
 </body>
