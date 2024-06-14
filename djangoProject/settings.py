@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-(sv%=sw+za$ccbn(coij3%4$31c$pzu#t$vthuqu$mldzh=-98
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+NGROK_HOST = 'bef6-84-54-73-46.ngrok-free.app'
+
+ALLOWED_HOSTS = [NGROK_HOST, 'http://127.0.0.1:8000/', '127.0.0.1:8000', '*']
+
+CSRF_TRUSTED_ORIGINS = [f"https://{NGROK_HOST}"]
 
 
 # Application definition
@@ -63,8 +67,7 @@ ROOT_URLCONF = 'djangoProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -134,9 +137,6 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
-
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 LOGIN_URL = 'users:login'
 

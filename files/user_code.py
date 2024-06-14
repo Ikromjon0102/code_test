@@ -1,1 +1,2 @@
-print(sum(map(int, input().split())))
+a = int(input(""))
+print(a = a)

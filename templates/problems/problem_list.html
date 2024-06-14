@@ -5,11 +5,56 @@
 
 {% block content %}
     <h1>Problem List</h1>
-    <ul class="problem-list">
-        {% for problem in problems %}
-            <li>
-                <a href="{% url 'problems:problem_detail' problem.pk %}">{{ problem.title }}</a>
-            </li>
-        {% endfor %}
-    </ul>
+    <div class="row">
+        <div class="col-2 border-right">
+            <h5>Mavzular</h5>
+            {% for theme in themes %}
+                <a class="btn btn-sm mb-1" href="{% url 'problems:problem-of-theme' theme.slug %}">{{ theme.name }}</a>
+            {% endfor %}
+        </div>
+        <div class="col-9">
+            <table class="table">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Nomi ( {{ problems|length }} )</th>
+                        <th>Darajasi</th>
+                        <th>Mavzusi</th>
+                        <th>Holati ( {{ user_problems|length }} )</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for problem in problems %}
+
+                    <tr class="">
+                        <th>
+                            {{ forloop.counter }}
+                        </th>
+                        <th>
+                            <a href="{% url 'problems:problem_detail' problem.pk %}">{{ problem.title }}</a>
+                        </th>
+                        <th>
+                            {{ problem.level }}
+                        </th>
+                        <th>
+                            {{ problem.theme }}
+                        </th>
+                        <th>
+                            {% if problem.title in user_problems %}
+                                <svg style="width: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z" fill="green"/>
+                                </svg>
+                            {% else %}
+                                <svg style="width: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                    <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" fill="red"/>
+                                </svg>
+                            {% endif %}
+                        </th>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 {% endblock %}

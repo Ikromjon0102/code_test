@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 # Create your views here.
@@ -305,6 +306,7 @@ from .models import Submission
 
 
 @csrf_exempt
+@login_required
 def submit_code(request, problem_id):
     problem = get_object_or_404(Problem, pk=problem_id)
 
@@ -336,10 +338,10 @@ def submit_code(request, problem_id):
             # Kodni tekshirish va natijani olish
             try:
                 if language == 'python':
-                    with open('files/user_code.py', 'w') as code_file:
+                    with open(f'files/{request.user.username}-{problem.slug}.py', 'w') as code_file:
                         code_file.write(user_code)
                     result = subprocess.run(
-                        ['python', 'files/user_code.py'],
+                        ['python', f'files/{request.user.username}-{problem.slug}.py'],
                         input=input_data,
                         text=True,
                         capture_output=True,
@@ -432,11 +434,13 @@ def submit_code(request, problem_id):
             for res in all_results
         ]) + f"\nTotal Success: {success_count}\nTotal Errors: {error_count}"
         if not error_count:
-            user = UserProblem.objects.create(user=request.user,problem=problem)
             problems = UserProblem.objects.filter(user=request.user)
-            print(problems)
-
-            user.save()
+            problems_title = [i.problem.id for i in problems]
+            if problem_id not in problems_title:
+                user = UserProblem.objects.create(user=request.user,problem=problem)
+                problems = UserProblem.objects.filter(user=request.user)
+                print(problems)
+                user.save()
         submission.save()
         return render(request, 'submissions/submission_result.html', context={
             'submission': submission,

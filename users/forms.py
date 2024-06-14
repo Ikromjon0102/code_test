@@ -31,13 +31,19 @@ from users.models import CustomUser
 class UserCreateForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ('username','email','first_name','last_name', 'password')
+        fields = ('username','email','first_name','last_name', 'gender', 'password')
 
     def save(self, commit=True):
         user = super().save(commit)
+
+        gender = self.cleaned_data['gender']
+        if gender == 'male':
+            user.profile_picture = 'profile_pictures/default_boy_pic.jpg'
+        elif gender == 'female':
+            user.profile_picture = 'profile_pictures/default_girl_pic.jpg'
+
         user.set_password(self.cleaned_data['password'])
         user.save()
-
         return user
 
 class UserUpdateForm(forms.ModelForm):
