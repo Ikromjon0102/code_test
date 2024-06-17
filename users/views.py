@@ -6,28 +6,54 @@ from users.models import CustomUser
 from django.shortcuts import render, redirect
 from django.views import View
 from users.forms import UserCreateForm, UserUpdateForm
+from django.contrib.auth import login
+
+
+
+# class RegisterView(View):
+#     def get(self, request):
+#         create_user = UserCreateForm()
+#
+#         context = {
+#             'form':create_user
+#         }
+#         return render(request=request, template_name='users/register.html', context=context)
+#
+#     def post(self, request):
+#         create_form = UserCreateForm(data=request.POST)
+#
+#         if create_form.is_valid():
+#             create_form.save()
+#             return redirect('problems:problem_list')
+#         else:
+#             context = {
+#                 'form': create_form
+#             }
+#             return render(request=request, template_name='users/register.html', context=context)
+
+
 
 
 class RegisterView(View):
     def get(self, request):
         create_user = UserCreateForm()
-
         context = {
-            'form':create_user
+            'form': create_user
         }
         return render(request=request, template_name='users/register.html', context=context)
 
     def post(self, request):
         create_form = UserCreateForm(data=request.POST)
-
         if create_form.is_valid():
-            create_form.save()
-            return redirect('users:login')
+            user = create_form.save()
+            login(request, user)
+            return redirect('problems:problem_list')
         else:
             context = {
                 'form': create_form
             }
             return render(request=request, template_name='users/register.html', context=context)
+
 
 # class LoginView(View):
 #     def get(self, request):
