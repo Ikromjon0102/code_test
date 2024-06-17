@@ -1,33 +1,60 @@
 from django.contrib import messages
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, get_user_model
+
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from users.models import CustomUser
 from django.shortcuts import render, redirect
 from django.views import View
 from users.forms import UserCreateForm, UserUpdateForm
+from django.contrib.auth import login
+
+
+
+# class RegisterView(View):
+#     def get(self, request):
+#         create_user = UserCreateForm()
+#
+#         context = {
+#             'form':create_user
+#         }
+#         return render(request=request, template_name='users/register.html', context=context)
+#
+#     def post(self, request):
+#         create_form = UserCreateForm(data=request.POST)
+#
+#         if create_form.is_valid():
+#             create_form.save()
+#             return redirect('problems:problem_list')
+#         else:
+#             context = {
+#                 'form': create_form
+#             }
+#             return render(request=request, template_name='users/register.html', context=context)
+
+
 
 
 class RegisterView(View):
     def get(self, request):
         create_user = UserCreateForm()
-
         context = {
-            'form':create_user
+            'form': create_user
         }
         return render(request=request, template_name='users/register.html', context=context)
 
     def post(self, request):
         create_form = UserCreateForm(data=request.POST)
-
         if create_form.is_valid():
-            create_form.save()
-            return redirect('users:login')
+            user = create_form.save()
+            # login(request, user)
+            return redirect('users:verify_email')
         else:
             context = {
                 'form': create_form
             }
             return render(request=request, template_name='users/register.html', context=context)
+
 
 # class LoginView(View):
 #     def get(self, request):
@@ -118,3 +145,21 @@ class ProfileUpdateView(LoginRequiredMixin,View):
             return redirect('users:profile')
 
         return render(request, 'users/profile_edit.html', {'form': form})
+
+
+User = get_user_model()
+
+def verify_email(request):
+    if request.method == 'POST':
+        code = request.POST.get('verification_code')
+        try:
+            user = User.objects.get(verification_code=code)
+            user.email_verified = True
+            user.verification_code = None  # Clear the verification code
+            user.save()
+            login(request, user)
+            messages.success(request, 'Your email has been verified!')
+            return redirect('problems:problem_list')
+        except User.DoesNotExist:
+            messages.error(request, 'Invalid verification code.')
+    return render(request, 'users/verify_email.html')

@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib.auth import login
+
 from users.models import CustomUser
 
 
@@ -28,23 +30,101 @@ from users.models import CustomUser
 #
 #         user.save()
 
-class UserCreateForm(forms.ModelForm):
+# class UserCreateForm(forms.ModelForm):
+#     class Meta:
+#         model = CustomUser
+#         fields = ('username','email','first_name','last_name', 'gender', 'password')
+#
+#     def save(self, commit=True):
+#         user = super().save(commit)
+#
+#         gender = self.cleaned_data['gender']
+#         if gender == 'male':
+#             user.profile_picture = 'profile_pictures/default_boy_pic.jpg'
+#         elif gender == 'female':
+#             user.profile_picture = 'profile_pictures/default_girl_pic.jpg'
+#
+#         user.set_password(self.cleaned_data['password'])
+#         user.save()
+#         return user
+
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from .models import CustomUser
+
+# class UserCreateForm(UserCreationForm):
+#     class Meta:
+#         model = CustomUser
+#         fields = ('username', 'email', 'first_name', 'last_name', 'gender')
+#
+#     def clean_email(self):
+#         email = self.cleaned_data.get('email')
+#         if CustomUser.objects.filter(email=email).exists():
+#             raise forms.ValidationError("This email address is already in use.")
+#         return email
+#
+#     def save(self, commit=True):
+#         user = super().save(commit=False)
+#
+#         gender = self.cleaned_data.get('gender')
+#         if gender:
+#             if gender == 'male':
+#                 user.profile_picture = 'profile_pictures/default_boy_pic.jpg'
+#             elif gender == 'female':
+#                 user.profile_picture = 'profile_pictures/default_girl_pic.jpg'
+#         if commit:
+#             user.save()
+#         return user
+
+
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.core.mail import send_mail
+from .models import CustomUser
+import random
+
+
+class UserCreateForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
     class Meta:
         model = CustomUser
-        fields = ('username','email','first_name','last_name', 'gender', 'password')
+        fields = ('username', 'email', 'first_name', 'last_name', 'gender')
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email address is already in use.")
+        return email
 
     def save(self, commit=True):
-        user = super().save(commit)
+        user = super().save(commit=False)
 
-        gender = self.cleaned_data['gender']
-        if gender == 'male':
-            user.profile_picture = 'profile_pictures/default_boy_pic.jpg'
-        elif gender == 'female':
-            user.profile_picture = 'profile_pictures/default_girl_pic.jpg'
+        gender = self.cleaned_data.get('gender')
+        if gender:
+            if gender == 'male':
+                user.profile_picture = 'profile_pictures/default_boy_pic.jpg'
+            elif gender == 'female':
+                user.profile_picture = 'profile_pictures/default_girl_pic.jpg'
 
-        user.set_password(self.cleaned_data['password'])
-        user.save()
+        user.verification_code = generate_verification_code()
+
+        if commit:
+            user.save()
+            self.send_verification_email(user)
         return user
+
+    def send_verification_email(self, user):
+        subject = "Email Verification"
+        message = f"Your verification code is {user.verification_code}"
+        from_email = "your_email@example.com"
+        recipient_list = [user.email]
+        send_mail(subject, message, from_email, recipient_list)
+
+
+def generate_verification_code():
+    return str(random.randint(100000, 999999))
+
 
 class UserUpdateForm(forms.ModelForm):
     class Meta:

@@ -6,9 +6,9 @@ from problems.models import Problem
 class Submission(models.Model):
     LANGUAGE_CHOICES = [
         ('python', 'Python'),
-        # ('java', 'Java'),
-        # ('cpp', 'C++'),
-        # ('javascript', 'JavaScript')
+        ('java', 'Java'),
+        ('cpp', 'C++'),
+        ('javascript', 'JavaScript')
         # # Yana boshqa tillarni qo'shishingiz mumkin
     ]
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)

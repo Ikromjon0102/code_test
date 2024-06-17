@@ -6,14 +6,34 @@
 {% load crispy_forms_tags %}
 
 <h3>Register page</h3>
+{#<div class="row">#}
+{#    <div class="col-4">#}
+{#        <form method="post" action="{% url 'users:register' %}">{% csrf_token %}#}
+{#            {{ form | crispy }}#}
+{#            <button type="submit" class="btn btn-primary"> Yuborish </button>#}
+{#        </form>#}
+{#    </div>#}
+{#</div>#}
+
 <div class="row">
-    <div class="col-4">
-        <form method="post" action="{% url 'users:register' %}">{% csrf_token %}
-            {{ form | crispy }}
-            <button type="submit" class="btn btn-primary"> Yuborish </button>
-        </form>
+    <div class="col-6">
+    <form method="post">
+        {% csrf_token %}
+        {{ form | crispy }}
+{#        <div>#}
+{#            <label for="id_password1">Password:</label>#}
+{#            <input type="password" name="password1" id="id_password1">#}
+{#            <span class="password-eye" onclick="togglePasswordVisibility('id_password1')">👁️</span>#}
+{#        </div>#}
+{#        <div>#}
+{#            <label for="id_password2">Confirm Password:</label>#}
+{#            <input type="password" name="password2" id="id_password2">#}
+{#            <span class="password-eye" onclick="togglePasswordVisibility('id_password2')">👁️</span>#}
+{#        </div>#}
+        <button type="submit">Register</button>
+    </form>
+
+
     </div>
-</div>
-
-
+    </div>
 {% endblock %}
