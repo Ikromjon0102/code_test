@@ -1,0 +1,25 @@
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/javascript/javascript.min.js"></script>
+
+<script>
+    var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("code"), {
+        lineNumbers: true,
+        mode: "python",
+        theme: "dracula"
+    });
+    document.getElementById('language').addEventListener('change', function() {
+        var language = this.value;
+        var mode = "python";
+        if (language === 'java') {
+            mode = 'text/x-java';
+        } else if (language === 'cpp') {
+            mode = 'text/x-c++src';
+        } else if (language === 'javascript') {
+            mode = 'javascript';
+        }
+        myCodeMirror.setOption('mode', mode);
+    });
+</script>

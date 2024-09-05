@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %} Verify Email {% endblock %}
+
+
+{% block content %}
+    <h2>Verify Your Email</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="verification_code">Verification Code:</label>
+        <input type="number" id="verification_code" name="verification_code" required>
+        <button type="submit">Verify</button>
+    </form>
+{% endblock %}
