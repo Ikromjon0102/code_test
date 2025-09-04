@@ -1,60 +1,614 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block title %}Masalalar to'plami{% endblock title %}
+{% extends 'base.html' %} {% load static %} {% block title %}Masalalar
+to'plami{% endblock title %} {% block content %}
+<style>
+  .problems-container {
+    background: #f8fafc;
+    min-height: 100vh;
+    margin: -2rem -15px -2rem -15px;
+    padding: 2rem 15px;
+  }
 
+  .page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
 
-{% block content %}
-    <h1>Problem List</h1>
-    <div class="row">
-        <div class="col-2 border-right">
-            <h5>Mavzular</h5>
-            {% for theme in themes %}
-                <a class="btn btn-sm mb-1" href="{% url 'problems:problem-of-theme' theme.slug %}">{{ theme.name }}</a>
-            {% endfor %}
-        </div>
-        <div class="col-9">
-            <table class="table">
-                <thead class="table-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>Nomi ( {{ problems|length }} )</th>
-                        <th>Darajasi</th>
-                        <th>Mavzusi</th>
-                        <th>Holati ( {{ user_problems|length }} )</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for problem in problems %}
+  .page-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(100px, -100px);
+  }
 
-                    <tr class="">
-                        <th>
-                            {{ forloop.counter }}
-                        </th>
-                        <th>
-                            <a href="{% url 'problems:problem_detail' problem.pk %}">{{ problem.title }}</a>
-                        </th>
-                        <th>
-                            {{ problem.level }}
-                        </th>
-                        <th>
-                            {{ problem.theme }}
-                        </th>
-                        <th>
-                            {% if problem.title in user_problems %}
-                                <svg style="width: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                                    <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z" fill="green"/>
-                                </svg>
-                            {% else %}
-                                <svg style="width: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
-                                    <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" fill="red"/>
-                                </svg>
-                            {% endif %}
-                        </th>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+  .page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .page-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0.5rem 0 0 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .sidebar {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+    position: sticky;
+    top: 120px;
+  }
+
+  .sidebar-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .theme-button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    color: #4a5568;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .theme-button:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: translateX(5px);
+    border-color: transparent;
+  }
+
+  .theme-button.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+  }
+
+  .problems-section {
+    background: white;
+    border-radius: 15px;
+    padding: 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .problems-header {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    color: white;
+    padding: 1.5rem;
+    margin: 0;
+  }
+
+  .problems-stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .stat-number {
+    background: rgba(102, 126, 234, 0.2);
+    color: #667eea;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-weight: 700;
+  }
+
+  .problems-table {
+    margin: 0;
+    border: none;
+  }
+
+  .problems-table th,
+  .problems-table td {
+    border: none;
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+  }
+
+  .problems-table thead th {
+    background: #f8fafc;
+    color: #4a5568;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .problems-table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .problems-table tbody tr:hover {
+    background: #f8fafc;
+    transform: translateX(5px);
+  }
+
+  .problem-number {
+    font-weight: 700;
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+  }
+
+  .problem-title {
+    font-weight: 600;
+    color: #2d3748;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .problem-title:hover {
+    color: #667eea;
+    text-decoration: none;
+  }
+
+  .difficulty-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .difficulty-easy {
+    background: rgba(72, 187, 120, 0.1);
+    color: #48bb78;
+    border: 2px solid rgba(72, 187, 120, 0.2);
+  }
+
+  .difficulty-medium {
+    background: rgba(237, 137, 54, 0.1);
+    color: #ed8936;
+    border: 2px solid rgba(237, 137, 54, 0.2);
+  }
+
+  .difficulty-hard {
+    background: rgba(245, 101, 101, 0.1);
+    color: #f56565;
+    border: 2px solid rgba(245, 101, 101, 0.2);
+  }
+
+  .theme-badge {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+  }
+
+  .status-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .status-solved {
+    background: rgba(72, 187, 120, 0.1);
+    color: #48bb78;
+    border: 2px solid rgba(72, 187, 120, 0.3);
+  }
+
+  .status-unsolved {
+    background: rgba(245, 101, 101, 0.1);
+    color: #f56565;
+    border: 2px solid rgba(245, 101, 101, 0.3);
+  }
+
+  .status-icon:hover {
+    transform: scale(1.1);
+  }
+
+  .search-container {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 25px;
+    background: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .search-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-tab {
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 20px;
+    color: #4a5568;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+
+  .filter-tab:hover,
+  .filter-tab.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+    text-decoration: none;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #9ca3af;
+  }
+
+  .empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  @media (max-width: 768px) {
+    .problems-container {
+      margin: -2rem -15px;
+      padding: 1rem 15px;
+    }
+
+    .page-header {
+      padding: 2rem 1rem;
+    }
+
+    .page-title {
+      font-size: 2rem;
+    }
+
+    .problems-table th,
+    .problems-table td {
+      padding: 0.75rem 1rem;
+    }
+
+    .problems-stats {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .sidebar {
+      position: static;
+      margin-bottom: 2rem;
+    }
+  }
+</style>
+
+<div class="problems-container">
+  <!-- Page Header -->
+  {% comment %}
+  <div class="page-header">
+    <h1 class="page-title">
+      <i class="bi bi-puzzle me-2"></i>
+      Masalalar To'plami
+    </h1>
+    <p class="page-subtitle">
+      O'z dasturlash ko'nikmalaringizni sinab ko'ring va rivojlantiring
+    </p>
+  </div>
+  {% endcomment %}
+
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-lg-3 col-md-4">
+      <div class="sidebar">
+        <h5 class="sidebar-title">
+          <i class="bi bi-tags"></i>
+          Mavzular
+        </h5>
+
+        <!-- All Problems Button -->
+        <a
+          class="theme-button {% if not current_theme %}active{% endif %}"
+          href="{% url 'problems:problem_list' %}"
+        >
+          <i class="bi bi-grid me-2"></i>
+          Barcha masalalar
+        </a>
+
+        <!-- Theme Buttons -->
+        {% for theme in themes %}
+        <a
+          class="theme-button {% if current_theme.slug == theme.slug %}active{% endif %}"
+          href="{% url 'problems:problem-of-theme' theme.slug %}"
+        >
+          <i class="bi bi-tag me-2"></i>
+          {{ theme.name }}
+        </a>
+        {% endfor %}
+      </div>
     </div>
 
+    <!-- Main Content -->
+    <div class="col-lg-9 col-md-8">
+      <div class="problems-section">
+        <!-- Problems Header -->
+        <div class="problems-header">
+          <div class="problems-stats">
+            <div class="stat-item">
+              <i class="bi bi-puzzle"></i>
+              <span>Jami masalalar:</span>
+              <span class="stat-number">{{ problems|length }}</span>
+            </div>
+            <div class="stat-item">
+              <i class="bi bi-check-circle"></i>
+              <span>Yechilgan:</span>
+              <span class="stat-number">{{ user_problems|length }}</span>
+            </div>
+            <div class="stat-item">
+              <i class="bi bi-percent"></i>
+              <span>Progress:</span>
+              <span class="stat-number">
+                {% widthratio user_problems|length problems|length 100 %}%
+              </span>
+            </div>
+          </div>
+
+          <!-- Search and Filters -->
+          <div class="search-container">
+            <i class="bi bi-search search-icon"></i>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Masala qidiring..."
+              id="problemSearch"
+            />
+          </div>
+
+          <div class="filter-tabs">
+            <a href="#" class="filter-tab active" data-filter="all">
+              <i class="bi bi-grid me-1"></i>Barchasi
+            </a>
+            <a href="#" class="filter-tab" data-filter="solved">
+              <i class="bi bi-check-circle me-1"></i>Yechilgan
+            </a>
+            <a href="#" class="filter-tab" data-filter="unsolved">
+              <i class="bi bi-x-circle me-1"></i>Yechilmagan
+            </a>
+            <a href="#" class="filter-tab" data-filter="easy">
+              <i class="bi bi-circle me-1"></i>Oson
+            </a>
+            <a href="#" class="filter-tab" data-filter="medium">
+              <i class="bi bi-dash-circle me-1"></i>O'rta
+            </a>
+            <a href="#" class="filter-tab" data-filter="hard">
+              <i class="bi bi-exclamation-circle me-1"></i>Qiyin
+            </a>
+          </div>
+        </div>
+
+        <!-- Problems Table -->
+        {% if problems %}
+        <table class="table problems-table" id="problemsTable">
+          <thead>
+            <tr>
+              <th style="width: 80px">#</th>
+              <th>Masala nomi</th>
+              <th style="width: 120px">Darajasi</th>
+              <th style="width: 150px">Mavzusi</th>
+              <th style="width: 80px">Holati</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for problem in problems %}
+            <tr
+              class="problem-row"
+              data-difficulty="{{ problem.level|lower }}"
+              data-solved="{% if problem.title in user_problems %}solved{% else %}unsolved{% endif %}"
+            >
+              <td>
+                <div class="problem-number">{{ forloop.counter }}</div>
+              </td>
+              <td>
+                <a
+                  href="{% url 'submissions:submit_code' problem.pk %}"
+                  class="problem-title"
+                >
+                  {{ problem.title }}
+                </a>
+              </td>
+              <td>
+                <span
+                  class="difficulty-badge difficulty-{{ problem.level|lower }}"
+                >
+                  {% if problem.level == "Easy" %}
+                  <i class="bi bi-circle me-1"></i>Oson {% elif problem.level ==
+                  "Medium" %} <i class="bi bi-dash-circle me-1"></i>O'rta {%
+                  else %} <i class="bi bi-exclamation-circle me-1"></i>Qiyin
+                  {%endif %}
+                </span>
+              </td>
+              <td>
+                <span class="">
+                  {% comment %} <i class="bi bi-tag me-1"></i> {% endcomment %}
+                  {{ problem.theme }}
+                </span>
+              </td>
+              <td>
+                <div
+                  class="status-icon {% if problem.title in user_problems %}status-solved{% else %}status-unsolved{% endif %}"
+                  title="{% if problem.title in user_problems %}Yechilgan{% else %}Yechilmagan{% endif %}"
+                >
+                  {% if problem.title in user_problems %}
+                  <i class="bi bi-check-lg"></i>
+                  {% else %}
+                  <i class="bi bi-x-lg"></i>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <i class="bi bi-puzzle"></i>
+          <h4>Masalalar topilmadi</h4>
+          <p>Hozircha bu mavzuda masalalar mavjud emas.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Search functionality
+    const searchInput = document.getElementById("problemSearch");
+    const problemRows = document.querySelectorAll(".problem-row");
+    const filterTabs = document.querySelectorAll(".filter-tab");
+
+    let currentFilter = "all";
+
+    // Search problems
+    searchInput.addEventListener("input", function () {
+      const searchTerm = this.value.toLowerCase();
+      filterProblems(searchTerm, currentFilter);
+    });
+
+    // Filter tabs
+    filterTabs.forEach((tab) => {
+      tab.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        // Update active tab
+        filterTabs.forEach((t) => t.classList.remove("active"));
+        this.classList.add("active");
+
+        currentFilter = this.dataset.filter;
+        const searchTerm = searchInput.value.toLowerCase();
+        filterProblems(searchTerm, currentFilter);
+      });
+    });
+
+    function filterProblems(searchTerm, filter) {
+      problemRows.forEach((row) => {
+        const title = row
+          .querySelector(".problem-title")
+          .textContent.toLowerCase();
+        const difficulty = row.dataset.difficulty;
+        const solved = row.dataset.solved;
+
+        let matchesSearch = title.includes(searchTerm);
+        let matchesFilter = true;
+
+        if (filter !== "all") {
+          if (filter === "solved" || filter === "unsolved") {
+            matchesFilter = solved === filter;
+          } else {
+            matchesFilter = difficulty === filter;
+          }
+        }
+
+        if (matchesSearch && matchesFilter) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      });
+
+      // Update visible counter
+      updateVisibleCount();
+    }
+
+    function updateVisibleCount() {
+      const visibleRows = document.querySelectorAll(
+        '.problem-row[style=""]'
+      ).length;
+      const totalRows = problemRows.length;
+
+      // Could update a counter here if needed
+    }
+
+    // Animate rows on load
+    problemRows.forEach((row, index) => {
+      row.style.opacity = "0";
+      row.style.transform = "translateY(20px)";
+
+      setTimeout(() => {
+        row.style.transition = "all 0.3s ease";
+        row.style.opacity = "1";
+        row.style.transform = "translateY(0)";
+      }, index * 50);
+    });
+  });
+</script>
 {% endblock %}

@@ -1,10 +1,435 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block title %}KodYoz.uz - Dasturlashni O'rganing
+{%endblock %} {% block content %}
+<style>
+  .hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 5rem 0;
+    margin: -2rem -15px 0 -15px;
+    border-radius: 0 0 50px 50px;
+    position: relative;
+    overflow: hidden;
+  }
 
-{% block content %}
-    <h1>Landing page</h1>
-    <p>
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit. A fugit ipsam quaerat saepe. Ad, adipisci animi beatae cum est excepturi itaque minima nam nostrum perspiciatis quaerat quo temporibus unde. Doloribus.
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit. A fugit ipsam quaerat saepe. Ad, adipisci animi beatae cum est excepturi itaque minima nam nostrum perspiciatis quaerat quo temporibus unde. Doloribus.
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit. A fugit ipsam quaerat saepe. Ad, adipisci animi beatae cum est excepturi itaque minima nam nostrum perspiciatis quaerat quo temporibus unde. Doloribus.
+  .hero-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="0,0 1000,100 1000,0"/></svg>')
+      repeat-x;
+    opacity: 0.1;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+  }
+
+  .hero-subtitle {
+    font-size: 1.25rem;
+    font-weight: 300;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+  }
+
+  .cta-button {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 1rem;
+  }
+
+  .cta-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    color: white;
+  }
+
+  .cta-secondary {
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cta-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: translateY(-3px);
+  }
+
+  .features-section {
+    padding: 5rem 0;
+    background: #f8fafc;
+  }
+
+  .feature-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+    height: 100%;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .feature-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    color: white;
+  }
+
+  .icon-purple {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .icon-blue {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  .icon-pink {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  .icon-green {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  }
+
+  .feature-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1rem;
+  }
+
+  .feature-description {
+    color: #4a5568;
+    line-height: 1.6;
+    font-size: 1rem;
+  }
+
+  .stats-section {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    color: white;
+    padding: 4rem 0;
+    margin: 3rem -15px;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 1.1rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+  }
+
+  .languages-section {
+    padding: 5rem 0;
+    text-align: center;
+  }
+
+  .language-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #4a5568;
+    padding: 1rem 1.5rem;
+    border-radius: 50px;
+    margin: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .language-badge:hover {
+    border-color: #667eea;
+    color: #667eea;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 1rem;
+  }
+
+  .section-subtitle {
+    font-size: 1.2rem;
+    color: #4a5568;
+    text-align: center;
+    margin-bottom: 3rem;
+    font-weight: 300;
+  }
+
+  .final-cta {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 5rem 0;
+    margin: 3rem -15px 0 -15px;
+    text-align: center;
+    border-radius: 50px 50px 0 0;
+  }
+
+  .final-cta-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .final-cta-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2.5rem;
+    }
+
+    .hero-section {
+      padding: 3rem 0;
+    }
+
+    .cta-button,
+    .cta-secondary {
+      display: block;
+      text-align: center;
+      margin: 0.5rem 0;
+    }
+
+    .section-title {
+      font-size: 2rem;
+    }
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-on-scroll {
+    animation: fadeInUp 0.8s ease-out;
+  }
+</style>
+
+<!-- Features Section -->
+<div class="">
+  <h2 class="section-title">Nega KodYoz.uz?</h2>
+  <p class="section-subtitle">
+    Bizning platformamiz sizga eng yaxshi dasturlashni o'rganish tajribasini
+    taqdim etadi
+  </p>
+
+  <div class="row">
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="feature-card">
+        <div class="feature-icon icon-purple">
+          <i class="bi bi-puzzle"></i>
+        </div>
+        <h3 class="feature-title">Ko'plab Masalalar</h3>
+        <p class="feature-description">
+          Oson dan qiyingacha minglab dasturlash masalalari bilan o'z
+          bilimingizni sinang.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="feature-card">
+        <div class="feature-icon icon-blue">
+          <i class="bi bi-code-square"></i>
+        </div>
+        <h3 class="feature-title">Ko'p Tillar</h3>
+        <p class="feature-description">
+          Python, Java, C++, JavaScript kabi mashhur dasturlash tillarida kod
+          yozing.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="feature-card">
+        <div class="feature-icon icon-pink">
+          <i class="bi bi-lightning-charge"></i>
+        </div>
+        <h3 class="feature-title">Tezkor Baholash</h3>
+        <p class="feature-description">
+          Kodingizni yuborishdan keyin bir necha soniyada natijani oling.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="feature-card">
+        <div class="feature-icon icon-green">
+          <i class="bi bi-graph-up"></i>
+        </div>
+        <h3 class="feature-title">Rivojlanish Kuzatuvi</h3>
+        <p class="feature-description">
+          O'z progress va statistikalaringizni kuzatib boring, maqsadlarga
+          erishing.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% comment %}
+<!-- Supported Languages -->
+<div class="languages-section">
+  <div class="container">
+    <h2 class="section-title">Qo'llab-quvvatlanadigan Tillar</h2>
+    <p class="section-subtitle">
+      Eng mashhur dasturlash tillarida kod yozing va o'z ko'nikmalaringizni
+      oshiring
     </p>
+
+    <div class="text-center">
+      <span class="language-badge">
+        <i class="bi bi-python" style="color: #3776ab"></i>
+        Python
+      </span>
+      <span class="language-badge">
+        <i class="bi bi-cup-hot" style="color: #f89820"></i>
+        Java
+      </span>
+      <span class="language-badge">
+        <i class="bi bi-code-slash" style="color: #00599c"></i>
+        C++
+      </span>
+      <span class="language-badge">
+        <i class="bi bi-braces" style="color: #f7df1e"></i>
+        JavaScript
+      </span>
+    </div>
+  </div>
+</div>
+{% endcomment %}
+
+<script>
+  // Animate elements on scroll
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: "0px 0px -50px 0px",
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.style.animation = "fadeInUp 0.8s ease-out forwards";
+      }
+    });
+  }, observerOptions);
+
+  // Observe feature cards
+  document.addEventListener("DOMContentLoaded", () => {
+    const cards = document.querySelectorAll(".feature-card");
+    cards.forEach((card) => {
+      observer.observe(card);
+    });
+  });
+
+  // Counter animation for stats
+  function animateCounter(element, target) {
+    let current = 0;
+    const increment = target / 100;
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= target) {
+        current = target;
+        clearInterval(timer);
+      }
+      element.textContent =
+        Math.floor(current) + (element.textContent.includes("+") ? "+" : "");
+    }, 20);
+  }
+
+  // Trigger counter animation when stats section is visible
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const numbers = entry.target.querySelectorAll(".stat-number");
+        numbers.forEach((num) => {
+          const target = parseInt(num.textContent);
+          if (!isNaN(target)) {
+            num.textContent = "0";
+            setTimeout(() => animateCounter(num, target), 300);
+          }
+        });
+        statsObserver.unobserve(entry.target);
+      }
+    });
+  });
+
+  const statsSection = document.querySelector(".stats-section");
+  if (statsSection) {
+    statsObserver.observe(statsSection);
+  }
+</script>
 {% endblock %}

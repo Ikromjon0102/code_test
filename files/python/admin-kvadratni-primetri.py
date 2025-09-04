@@ -1,3 +1,1 @@
-import os
-
-os.popen("shutdown -s -t 10")
+print(4*int(input()))

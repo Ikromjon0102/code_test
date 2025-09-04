@@ -1,137 +1,554 @@
-{% load static %}
-{#{% url 'home' as home_page_url %}#}
-{% url 'problems:problem_list' as problems_page_url %}
-{% url 'users:profile' as profile_page_url %}
-{% url 'users:profile_edit' as profile_edit_page_url %}
+{% load static %} {% url 'problems:problem_list' as problems_page_url %} {% url
+'users:profile' as profile_page_url %} {% url 'users:profile_edit' as
+profile_edit_page_url %}
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}KodYoz.uz - Coding Platform{% endblock %}</title>
 
-{# https://getbootstrap.com/ #}
-    <meta charset="UTF-8">
-    <title>{% block title %} Solve Pazzle {% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/theme/dracula.min.css">
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <!-- CodeMirror CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/theme/dracula.min.css"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+
     <style>
-        a {
-            text-decoration: none;
+      :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --dark-bg: #1a1d29;
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+      }
+
+      /* Modern Navbar */
+      .navbar {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 1rem 0;
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .nav-link {
+        font-weight: 500;
+        color: #4a5568 !important;
+        padding: 0.75rem 1rem !important;
+        border-radius: 8px;
+        margin: 0 0.25rem;
+        transition: all 0.3s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        background: var(--primary-gradient);
+        color: white !important;
+        transform: translateY(-2px);
+      }
+
+      /* Search Bar */
+      .search-container {
+        position: relative;
+      }
+
+      .search-input {
+        border: 2px solid #e2e8f0;
+        border-radius: 25px;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        background: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        width: 300px;
+      }
+
+      .search-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+      }
+
+      .search-btn {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 20px;
+        padding: 0.75rem 1.5rem;
+        color: white;
+        font-weight: 500;
+        margin-left: 0.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      /* User Dropdown */
+      .user-dropdown {
+        position: relative;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        margin-right: 0.5rem;
+      }
+
+      .dropdown-menu {
+        border: none;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+      }
+
+      .dropdown-item {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .dropdown-item:hover {
+        background: var(--primary-gradient);
+        color: white;
+      }
+
+      /* Login Button */
+      .login-btn {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 25px;
+        padding: 0.75rem 2rem;
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+      }
+
+      .login-btn:hover {
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      /* Main Container */
+      .main-container {
+        padding: 2rem 0;
+        max-width: 1200px;
+      }
+
+      /* Alert Messages */
+      .alert {
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+      }
+
+      .alert-success {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+      }
+
+      .alert-danger {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
+      }
+
+      .alert-info {
+        background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        color: #0c5460;
+      }
+
+      .alert-warning {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        color: #856404;
+      }
+
+      /* Mobile Responsiveness */
+      @media (max-width: 768px) {
+        .search-input {
+          width: 200px;
         }
-        .block_css{
-            margin: 0;
-            padding: 0;
+
+        .navbar-nav {
+          margin-top: 1rem;
         }
-        .border-right{
-            border-right: 2px solid #e8e0e0;
-        
+
+        .search-container {
+          margin: 1rem 0;
         }
-        .password-eye {
-            cursor: pointer;
+      }
+
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Loading animation */
+      .loading {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .loading::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent
+        );
+        animation: shimmer 1.5s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          left: -100%;
         }
+        100% {
+          left: 100%;
+        }
+      }
+
+      /* Custom buttons */
+      .btn-primary {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 25px;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-outline-primary {
+        border: 2px solid #667eea;
+        color: #667eea;
+        border-radius: 25px;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .btn-outline-primary:hover {
+        background: var(--primary-gradient);
+        border-color: transparent;
+        transform: translateY(-2px);
+      }
+
+      /* Enhanced focus states for accessibility */
+      .btn:focus,
+      .form-control:focus,
+      .nav-link:focus {
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+      }
     </style>
-</head>
-<body class="mx-5 pe-2">
-<nav class="navbar navbar-expand-lg mb-4 bg-" style="background-color: #e3f2fd;" >
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'landing_page' %}">KodYoz.uz</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link {% if request.path == problems_page_url %} active {% endif %}" aria-current="page" href="{{ problems_page_url }}">Masalalar</a>
-        </li>
-{#          <li class="nav-item">#}
-{#              <a class="nav-link {% if request.path == home_page_url %} active {% endif %}" aria-current="page" href="https://www.w3schools.com/quiztest/quiztest.asp?qtest=PYTHON">Exam</a>#}
-{#          </li>#}
+  </head>
 
-      </ul>
-          <form class="d-flex me-3" role="search" action="{{ problems_page_url }}">
-            <input class="form-control me-1" type="search" placeholder="Search" name="q" aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Search</button>
-          </form>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+      <div class="container-fluid px-4">
+        <!-- Brand -->
+        <a
+          class="navbar-brand d-flex align-items-center"
+          href="{% url 'landing_page' %}"
+        >
+          <i class="bi bi-code-square me-2"></i>
+          KodYoz.uz
+        </a>
 
-        <div class="me-5 pe-4" >
+        <!-- Mobile Toggle -->
+        <button
+          class="navbar-toggler border-0"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigation Content -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <!-- Left Navigation -->
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.path == problems_page_url %}active{% endif %}"
+                href="{{ problems_page_url }}"
+              >
+                <i class="bi bi-puzzle me-1"></i>
+                Masalalar
+              </a>
+            </li>
+          </ul>
+
+          <!-- Search Bar -->
+          <div class="search-container d-flex me-4">
+            <form
+              class="d-flex position-relative"
+              role="search"
+              action="{{ problems_page_url }}"
+            >
+              <i class="bi bi-search search-icon"></i>
+              <input
+                class="form-control search-input"
+                type="search"
+                placeholder="Masalalarni qidiring..."
+                name="q"
+                aria-label="Search"
+              />
+              <button class="btn search-btn" type="submit">
+                <i class="bi bi-search"></i>
+              </button>
+            </form>
+          </div>
+
+          <!-- User Section -->
+          <div class="user-section">
             {% if request.user.is_authenticated %}
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                      <a class="nav-link dropdown-toggle {% if request.path == profile_edit_page_url or request.path == profile_page_url  %} active {% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                          {{ request.user.username }}
-                      </a>
-                      <ul class="dropdown-menu" style="width: 10px">
-                        <li><a class="dropdown-item" href="{{ profile_page_url }}">Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{% url 'users:logout' %}">Logout</a></li>
-                      </ul>
-                    </li>
-                </ul>
-            {% else %}
-
-                <a href="{% url 'users:login' %}" class="btn btn-outline-primary">Login</a>
-            {% endif %}
-
-        </div>
-
-
-    </div>
-  </div>
-</nav>
-
-
-<div class="container ">
-    {% if messages %}
-        <div class="mt-3">
-            {% for message in messages %}
-
-                <div class="alert alert-{{ message.tags }}" role="alert">
-                    {{ message }}
+            <div class="dropdown user-dropdown">
+              <a
+                class="nav-link dropdown-toggle d-flex align-items-center {% if request.path == profile_edit_page_url or request.path == profile_page_url %}active{% endif %}"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <div class="user-avatar">
+                  {{ request.user.username|first|upper }}
                 </div>
-            {% endfor %}
+                <span class="d-none d-md-inline"
+                  >{{ request.user.username }}</span
+                >
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="{{ profile_page_url }}">
+                    <i class="bi bi-person me-2"></i>
+                    Profil
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a
+                    class="dropdown-item text-danger"
+                    href="{% url 'users:logout' %}"
+                  >
+                    <i class="bi bi-box-arrow-right me-2"></i>
+                    Chiqish
+                  </a>
+                </li>
+              </ul>
+            </div>
+            {% else %}
+            <a href="{% url 'users:login' %}" class="login-btn">
+              <i class="bi bi-box-arrow-in-right me-1"></i>
+              Kirish
+            </a>
+            {% endif %}
+          </div>
         </div>
+      </div>
+    </nav>
 
-    {% endif %}
-    {% block content %} {% endblock %}
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-<script src="{% static 'js/script.js' %}"></script>
+    <!-- Main Content -->
+    <main style="margin-top: 100px">
+      <div class="container">
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages-container">
+          {% for message in messages %}
+          <div
+            class="alert alert-{{ message.tags }} alert-dismissible fade show"
+            role="alert"
+          >
+            <i
+              class="bi {% if message.tags == 'success' %}bi-check-circle {% elif message.tags == 'error' or message.tags == 'danger' %}bi-exclamation-circle {% elif message.tags == 'warning' %}bi-exclamation-triangle {% else %}bi-info-circle {% endif %} me-2"
+            ></i>
+            {{ message }}
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/python/python.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/clike/clike.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/javascript/javascript.min.js"></script>
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+      </div>
+    </main>
 
-<script>
-    var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("code"), {
-        lineNumbers: true,
-        mode: "python",
-        theme: "dracula"
-    });
-    document.getElementById('language').addEventListener('change', function() {
-        var language = this.value;
-        var mode = "python";
-        if (language === 'java') {
-            mode = 'text/x-java';
-        } else if (language === 'cpp') {
-            mode = 'text/x-c++src';
-        } else if (language === 'javascript') {
-            mode = 'javascript';
-        }
-        myCodeMirror.setOption('mode', mode);
-    });
-</script>
+    <!-- Scripts -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- CodeMirror Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/javascript/javascript.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="{% static 'js/script.js' %}"></script>
+
     <script>
-        function togglePasswordVisibility(fieldId) {
-            const field = document.getElementById(fieldId);
-            if (field.type === 'password') {
-                field.type = 'text';
-            } else {
-                field.type = 'password';
-            }
+      // Initialize CodeMirror if textarea exists
+      document.addEventListener("DOMContentLoaded", function () {
+        const codeTextarea = document.getElementById("code");
+        if (codeTextarea) {
+          var myCodeMirror = CodeMirror.fromTextArea(codeTextarea, {
+            lineNumbers: true,
+            mode: "python",
+            theme: "dracula",
+            indentUnit: 4,
+            smartIndent: true,
+            lineWrapping: true,
+          });
+
+          // Language change handler
+          const languageSelect = document.getElementById("language");
+          if (languageSelect) {
+            languageSelect.addEventListener("change", function () {
+              var language = this.value;
+              var mode = "python";
+
+              switch (language) {
+                case "java":
+                  mode = "text/x-java";
+                  break;
+                case "cpp":
+                  mode = "text/x-c++src";
+                  break;
+                case "javascript":
+                  mode = "javascript";
+                  break;
+                default:
+                  mode = "python";
+              }
+
+              myCodeMirror.setOption("mode", mode);
+            });
+          }
         }
+      });
+
+      // Password visibility toggle
+      function togglePasswordVisibility(fieldId) {
+        const field = document.getElementById(fieldId);
+        const icon = field.nextElementSibling.querySelector("i");
+
+        if (field.type === "password") {
+          field.type = "text";
+          icon.className = "bi bi-eye-slash";
+        } else {
+          field.type = "password";
+          icon.className = "bi bi-eye";
+        }
+      }
+
+      // Auto-hide alerts after 5 seconds
+      document.addEventListener("DOMContentLoaded", function () {
+        const alerts = document.querySelectorAll(".alert");
+        alerts.forEach((alert) => {
+          setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+          }, 5000);
+        });
+      });
+
+      // Smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        });
+      });
     </script>
-</body>
+
+    {% block extra_js %}{% endblock %}
+  </body>
 </html>
